@@ -14,18 +14,25 @@ interface ChatMessage {
   properties?: any[];
 }
 
+interface UserPreferences {
+  budget?: number;
+  bedrooms?: number;
+  location?: string;
+}
+
 const starterQuestions = [
-  "Find properties under £1500",
-  "Best areas for families", 
-  "Shortest commute to City",
-  "Properties near good schools",
-  "Affordable areas in Zone 2",
-  "Pet-friendly rentals"
+  "2-bed under £1800 in Camden",
+  "Flats in Shoreditch", 
+  "3-bed under £2500",
+  "1-bed near King's Cross",
+  "Family homes in Clapham",
+  "Studio apartments under £1400"
 ];
 
-// Mock property data for demonstration
+// Extended mock property data
 const mockProperties = [
   {
+    id: "1",
     title: "Modern 2-bed Flat",
     price: "£1,400/month",
     location: "Canary Wharf, E14",
@@ -36,6 +43,7 @@ const mockProperties = [
     available: true,
   },
   {
+    id: "2",
     title: "Victorian House",
     price: "£1,650/month",
     location: "Clapham, SW4",
@@ -46,6 +54,7 @@ const mockProperties = [
     available: false,
   },
   {
+    id: "3",
     title: "Studio Apartment",
     price: "£1,200/month",
     location: "King's Cross, N1",
@@ -54,6 +63,39 @@ const mockProperties = [
     size: "450 sq ft",
     type: "rent" as const,
     available: true,
+  },
+  {
+    id: "4",
+    title: "Luxury 2-bed Apartment",
+    price: "£2,200/month",
+    location: "Shoreditch, E1",
+    bedrooms: 2,
+    bathrooms: 2,
+    size: "950 sq ft",
+    type: "rent" as const,
+    available: true,
+  },
+  {
+    id: "5",
+    title: "Family House",
+    price: "£2,800/month",
+    location: "Camden, NW1",
+    bedrooms: 3,
+    bathrooms: 2,
+    size: "1400 sq ft",
+    type: "rent" as const,
+    available: true,
+  },
+  {
+    id: "6",
+    title: "Compact Studio",
+    price: "£1,350/month",
+    location: "Shoreditch, E2",
+    bedrooms: 1,
+    bathrooms: 1,
+    size: "400 sq ft",
+    type: "rent" as const,
+    available: false,
   }
 ];
 
@@ -61,15 +103,63 @@ const Chat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
-      text: "Hello! I'm here to help you find the perfect property in London. How can I assist you today?",
+      text: "Hello! I'm here to help you find the perfect property in London. To get started, I'll need to know your budget, number of bedrooms, and preferred location. What are you looking for?",
       sender: "bot",
       timestamp: new Date(),
     }
   ]);
   const [inputText, setInputText] = useState("");
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
 
   const handleStarterClick = (question: string) => {
     handleSendMessage(question);
+  };
+
+  const extractPreferencesFromText = (text: string): Partial<UserPreferences> => {
+    const prefs: Partial<UserPreferences> = {};
+    
+    // Extract budget
+    const budgetMatch = text.match(/£(\d{1,3}(?:,\d{3})*|\d+)/);
+    if (budgetMatch) {
+      prefs.budget = parseInt(budgetMatch[1].replace(/,/g, ''));
+    }
+    
+    // Extract bedrooms
+    const bedroomMatch = text.match(/(\d+)[-\s]?bed/i) || text.match(/(\d+)\s?bedroom/i);
+    if (bedroomMatch) {
+      prefs.bedrooms = parseInt(bedroomMatch[1]);
+    }
+    
+    // Extract location
+    const locations = ['Camden', 'Shoreditch', 'Clapham', 'Canary Wharf', 'King\'s Cross', 'Islington', 'Hackney', 'Greenwich'];
+    for (const location of locations) {
+      if (text.toLowerCase().includes(location.toLowerCase())) {
+        prefs.location = location;
+        break;
+      }
+    }
+    
+    return prefs;
+  };
+
+  const findMatchingProperties = (prefs: UserPreferences) => {
+    return mockProperties.filter(property => {
+      const propertyPrice = parseInt(property.price.replace(/[£,/month]/g, ''));
+      
+      const budgetMatch = !prefs.budget || propertyPrice <= prefs.budget;
+      const bedroomMatch = !prefs.bedrooms || property.bedrooms === prefs.bedrooms;
+      const locationMatch = !prefs.location || property.location.toLowerCase().includes(prefs.location.toLowerCase());
+      
+      return budgetMatch && bedroomMatch && locationMatch;
+    });
+  };
+
+  const getMissingPreferences = (prefs: UserPreferences): string[] => {
+    const missing = [];
+    if (!prefs.budget) missing.push('budget');
+    if (!prefs.bedrooms) missing.push('number of bedrooms');
+    if (!prefs.location) missing.push('preferred location');
+    return missing;
   };
 
   const handleSendMessage = (text?: string) => {
@@ -86,22 +176,39 @@ const Chat = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputText("");
 
-    // Simulate bot response with property results
+    // Extract and update preferences
+    const newPrefs = extractPreferencesFromText(messageText);
+    const updatedPrefs = { ...userPreferences, ...newPrefs };
+    setUserPreferences(updatedPrefs);
+
+    // Generate bot response
     setTimeout(() => {
       let botResponse = "";
       let properties: any[] = [];
 
-      if (messageText.toLowerCase().includes("under £1500") || messageText.toLowerCase().includes("1500")) {
-        botResponse = "I found some great properties under £1500/month in London. Here are the available options:";
-        properties = mockProperties.filter(p => parseInt(p.price.replace(/[£,/month]/g, "")) < 1500);
-      } else if (messageText.toLowerCase().includes("families") || messageText.toLowerCase().includes("family")) {
-        botResponse = "For families, I recommend these areas known for good schools and safe neighborhoods:";
-        properties = mockProperties.filter(p => p.bedrooms >= 2);
-      } else if (messageText.toLowerCase().includes("commute") || messageText.toLowerCase().includes("city")) {
-        botResponse = "For the shortest commute to the City, these properties are well-connected:";
-        properties = mockProperties.filter(p => p.location.includes("Canary Wharf") || p.location.includes("King's Cross"));
+      const missing = getMissingPreferences(updatedPrefs);
+      
+      if (missing.length === 0) {
+        // All preferences collected, show matching properties
+        const matches = findMatchingProperties(updatedPrefs);
+        if (matches.length > 0) {
+          botResponse = `Perfect! Based on your preferences (${updatedPrefs.budget ? `£${updatedPrefs.budget}/month budget, ` : ''}${updatedPrefs.bedrooms} bedroom${updatedPrefs.bedrooms !== 1 ? 's' : ''} in ${updatedPrefs.location}), here are ${matches.length} matching properties:`;
+          properties = matches.slice(0, 3); // Show max 3 properties
+        } else {
+          botResponse = `I couldn't find any properties matching your exact criteria (${updatedPrefs.budget ? `£${updatedPrefs.budget}/month, ` : ''}${updatedPrefs.bedrooms} bedroom${updatedPrefs.bedrooms !== 1 ? 's' : ''} in ${updatedPrefs.location}). Let me show you some similar options:`;
+          properties = mockProperties.slice(0, 3);
+        }
+      } else if (missing.length === 3) {
+        // No preferences yet, general response
+        botResponse = "I'd be happy to help you find the perfect property! Could you tell me your budget, how many bedrooms you need, and which area you prefer?";
       } else {
-        botResponse = "I'd be happy to help you with that! Could you tell me more about your specific requirements such as budget, preferred area, or number of bedrooms?";
+        // Some preferences collected, ask for missing ones
+        const collected = [];
+        if (updatedPrefs.budget) collected.push(`£${updatedPrefs.budget}/month budget`);
+        if (updatedPrefs.bedrooms) collected.push(`${updatedPrefs.bedrooms} bedroom${updatedPrefs.bedrooms !== 1 ? 's' : ''}`);
+        if (updatedPrefs.location) collected.push(`${updatedPrefs.location} area`);
+        
+        botResponse = `Great! I have your ${collected.join(' and ')}. To find the perfect match, could you also tell me your ${missing.join(' and ')}?`;
       }
 
       const botMessage: ChatMessage = {

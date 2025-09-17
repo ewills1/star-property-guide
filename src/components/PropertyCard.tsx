@@ -1,8 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, Bed, Bath, Square, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface PropertyCardProps {
+  id?: string;
   title: string;
   price: string;
   location: string;
@@ -15,6 +17,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({
+  id,
   title,
   price,
   location,
@@ -25,10 +28,20 @@ const PropertyCard = ({
   available,
   image,
 }: PropertyCardProps) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (id) {
+      navigate(`/property/${id}`);
+    }
+  };
   return (
-    <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-medium ${
-      !available ? "opacity-75" : "hover:scale-[1.02]"
-    }`}>
+    <Card 
+      className={`relative overflow-hidden transition-all duration-300 hover:shadow-medium ${
+        !available ? "opacity-75" : "hover:scale-[1.02] cursor-pointer"
+      }`}
+      onClick={handleClick}
+    >
       {!available && (
         <div className="absolute top-3 right-3 z-10">
           <Badge variant="secondary" className="bg-unavailable text-unavailable-foreground">
