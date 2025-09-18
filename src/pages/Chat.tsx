@@ -231,10 +231,17 @@ const Chat = () => {
     const prefs: Partial<UserPreferences> = {};
 
     // Extract budget
-    const budgetMatch = text.match(/£?(\d+(?:,\d{3})*)/);
+    // Budget extraction — only match numbers that look like money:
+    // - "£3000"
+    // - "under 3000", "up to 2,500", "max 2500"
+    // - "2500 pcm", "2500 per month", "2500 monthly", "2500 budget"
+    const budgetRegex = /(?:£\s?(\d+(?:,\d{3})*))|(?:(?:under|below|up to|upto|max(?:imum)?|budget)\s*£?(\d+(?:,\d{3})*))|(\d+(?:,\d{3})*)\s*(?:pcm|p\/m|per month|\/month|monthly|budget)\b/i;
+    const budgetMatch = text.match(budgetRegex);
     if (budgetMatch) {
-      prefs.budget = parseInt(budgetMatch[1].replace(/,/g, ""), 10);
+      const rawNumber = budgetMatch[1] || budgetMatch[2] || budgetMatch[3];
+      prefs.budget = parseInt(rawNumber.replace(/,/g, ""), 10);
     }
+
 
 
     // Extract bedrooms (digit or word form)
