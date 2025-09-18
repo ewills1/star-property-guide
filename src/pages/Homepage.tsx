@@ -67,10 +67,12 @@ const Homepage = () => {
                   <MessageCircle className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary">
-                Browse Properties
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link to="/properties">
+                <Button variant="outline" size="lg" className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary">
+                  Browse Properties
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
