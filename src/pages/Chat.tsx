@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Send, MessageCircle, ArrowLeft, MapPin, Clock, ShoppingBag, Camera } from "lucide-react";
+import { Send, MessageCircle, ArrowLeft, MapPin, Clock, ShoppingBag, Camera, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import PropertyCard from "@/components/PropertyCard";
 import { mockProperties, Property } from "@/data/mockProperties";
@@ -368,20 +368,31 @@ const Chat = () => {
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
       <header className="bg-card border-b border-border shadow-soft">
-        <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link
-            to="/"
-            className="flex items-center text-primary hover:text-primary-hover transition-colors mr-4"
-          >
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            Back to Home
-          </Link>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
-            <MessageCircle className="h-6 w-6 text-primary mr-2" />
-            <h1 className="text-xl font-semibold text-foreground">
-              Property Chat Assistant
-            </h1>
+            <Link
+              to="/"
+              className="flex items-center text-primary hover:text-primary-hover transition-colors mr-4"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Back to Home
+            </Link>
+            <div className="flex items-center">
+              <MessageCircle className="h-6 w-6 text-primary mr-2" />
+              <h1 className="text-xl font-semibold text-foreground">
+                Property Chat Assistant
+              </h1>
+            </div>
           </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={clearChat}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            title="Reset chat"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
         </div>
       </header>
 
