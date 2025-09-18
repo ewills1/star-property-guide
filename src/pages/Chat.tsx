@@ -55,10 +55,38 @@ const Chat = () => {
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const botTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const inactivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const inactivityMessageSentRef = useRef(false);
 
   const handleStarterClick = (question: string) => {
     handleSendMessage(question);
   };
+
+  // Inactivity timer logic
+  useEffect(() => {
+    // Only set timer if it hasn't been sent yet
+    if (!inactivityMessageSentRef.current) {
+      if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
+      inactivityTimeoutRef.current = setTimeout(() => {
+        if (!inactivityMessageSentRef.current) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: crypto.randomUUID(),
+              type: "text",
+              text: "Is there anything I can help you with?",
+              sender: "bot",
+              timestamp: new Date(),
+            },
+          ]);
+          inactivityMessageSentRef.current = true;
+        }
+      }, 7500); // 7.5 seconds
+    }
+    return () => {
+      if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
+    };
+  }, [messages]);
 
   const extractPreferencesFromText = (text: string): Partial<UserPreferences> => {
     const prefs: Partial<UserPreferences> = {};
@@ -155,6 +183,9 @@ const Chat = () => {
     setMessages((prev) => [...prev, userMessage]);
     setInputText("");
 
+    // Clear inactivity timer on user message, but do not set inactivityMessageSentRef.current
+    if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
+
     // Extract and update preferences
     const newPrefs = extractPreferencesFromText(messageText);
     const updatedPrefs = { ...userPreferences, ...newPrefs };
@@ -222,6 +253,7 @@ const Chat = () => {
   useEffect(() => {
     return () => {
       if (botTimeoutRef.current) clearTimeout(botTimeoutRef.current);
+      if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
     };
   }, []);
 
