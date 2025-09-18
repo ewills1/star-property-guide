@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/Header";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -18,6 +18,13 @@ const Favourites = () => {
     return () => window.removeEventListener("focus", loadFavourites);
   }, []);
 
+  // Remove property from favourites
+  const handleRemoveFavourite = (propertyId: string) => {
+    const updatedFavourites = favouriteProperties.filter((p) => p.id !== propertyId);
+    setFavouriteProperties(updatedFavourites);
+    localStorage.setItem("favouriteProperties", JSON.stringify(updatedFavourites));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <Header />
@@ -28,8 +35,15 @@ const Favourites = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {favouriteProperties.map((property) => (
-              <Card key={property.id} className="hover:shadow-medium transition-all duration-300">
+              <Card key={property.id} className="hover:shadow-medium transition-all duration-300 relative">
                 <CardContent className="p-6">
+                  <button
+                    className="absolute top-4 right-4 text-primary hover:text-red-500 transition-colors"
+                    title="Remove from favourites"
+                    onClick={() => handleRemoveFavourite(property.id)}
+                  >
+                    <Heart fill="#ef4444" stroke="#ef4444" className="h-6 w-6" />
+                  </button>
                   <div className="flex items-center justify-between mb-2">
                     <h2 className="text-xl font-semibold text-foreground">{property.title}</h2>
                     {property.available ? (
