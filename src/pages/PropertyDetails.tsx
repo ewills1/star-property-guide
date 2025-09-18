@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Bed, Bath, Square, Check, X, Phone, Mail } from "lucide-react";
 import { mockProperties, Property } from "@/data/mockProperties";
+import ViewingBooking from "@/components/ViewingBooking";
 
 // Create a detailed map from the array
 const getPropertyDetails = () => {
@@ -164,7 +165,12 @@ const PropertyDetails = () => {
                   <Badge variant={property.type === "rent" ? "default" : "secondary"}>
                     For {property.type === "rent" ? "Rent" : "Sale"}
                   </Badge>
-                  {!property.available && (
+                  {property.status === "undergoing-viewings" && (
+                    <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
+                      Undergoing Viewings
+                    </Badge>
+                  )}
+                  {property.status === "taken" && (
                     <Badge variant="secondary" className="bg-unavailable text-unavailable-foreground">
                       <Check className="h-3 w-3 mr-1" />
                       Taken
@@ -199,13 +205,22 @@ const PropertyDetails = () => {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button 
-                    className="flex-1" 
-                    disabled={!property.available}
-                  >
-                    {property.available ? "Arrange Viewing" : "Not Available"}
-                  </Button>
                   {property.available && (
+                    <Button className="flex-1">
+                      Arrange Viewing
+                    </Button>
+                  )}
+                  {property.status === "undergoing-viewings" && (
+                    <Button className="flex-1" variant="outline">
+                      Join Viewing Queue
+                    </Button>
+                  )}
+                  {property.status === "taken" && (
+                    <Button className="flex-1" disabled>
+                      Property Taken
+                    </Button>
+                  )}
+                  {(property.available || property.status === "undergoing-viewings") && (
                     <Button variant="outline" className="flex-1" asChild>
                       <a href={`tel:${property.agent.phone}`}>
                         <Phone className="h-4 w-4 mr-2" />
@@ -301,6 +316,14 @@ const PropertyDetails = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Viewing Booking */}
+            {(property.available || property.status === "undergoing-viewings") && (
+              <ViewingBooking 
+                propertyId={property.id}
+                propertyTitle={property.title}
+              />
+            )}
           </div>
         </div>
       </div>

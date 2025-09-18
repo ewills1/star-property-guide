@@ -304,7 +304,11 @@ const Chat = () => {
                   message.properties.length > 0 && (
                     <div className="mt-4 space-y-3">
                       {message.properties.map((property) => (
-                        <PropertyCard key={property.id} {...property} />
+                        <PropertyCard 
+                          key={property.id} 
+                          {...property} 
+                          status={property.status}
+                        />
                       ))}
                     </div>
                   )}

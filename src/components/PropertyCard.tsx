@@ -13,6 +13,7 @@ interface PropertyCardProps {
   size: string;
   type: "rent" | "buy";
   available: boolean;
+  status?: "available" | "undergoing-viewings" | "taken";
   image?: string;
 }
 
@@ -26,6 +27,7 @@ const PropertyCard = ({
   size,
   type,
   available,
+  status,
   image,
 }: PropertyCardProps) => {
   const navigate = useNavigate();
@@ -38,11 +40,18 @@ const PropertyCard = ({
   return (
     <Card 
       className={`relative overflow-hidden transition-all duration-300 hover:shadow-medium ${
-        !available ? "opacity-75" : "hover:scale-[1.02] cursor-pointer"
-      }`}
+        !available ? "opacity-75" : "hover:scale-[1.02]"
+      } cursor-pointer`}
       onClick={handleClick}
     >
-      {!available && (
+      {status === "undergoing-viewings" && (
+        <div className="absolute top-3 right-3 z-10">
+          <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
+            Undergoing Viewings
+          </Badge>
+        </div>
+      )}
+      {status === "taken" && (
         <div className="absolute top-3 right-3 z-10">
           <Badge variant="secondary" className="bg-unavailable text-unavailable-foreground">
             <Check className="h-3 w-3 mr-1" />

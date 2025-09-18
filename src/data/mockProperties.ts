@@ -8,6 +8,7 @@ export interface Property {
   size: string;
   type: "rent" | "sale";
   available: boolean;
+  status?: "available" | "undergoing-viewings" | "taken";
   images?: string[];
   description?: string;
   features?: string[];
@@ -74,6 +75,7 @@ export const mockProperties: Property[] = [
     size: "1200 sq ft",
     type: "rent" as const,
     available: false,
+    status: "undergoing-viewings",
   },
   {
     id: "3",
@@ -118,6 +120,7 @@ export const mockProperties: Property[] = [
     size: "400 sq ft",
     type: "rent" as const,
     available: false,
+    status: "taken",
   },
   {
     id: "7",
@@ -184,6 +187,7 @@ export const mockProperties: Property[] = [
     size: "2200 sq ft",
     type: "rent" as const,
     available: false,
+    status: "undergoing-viewings",
   },
   {
     id: "13",
