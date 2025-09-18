@@ -28,6 +28,9 @@ const Header = () => {
           <Link to="/properties" className="text-foreground hover:text-primary transition-colors duration-200">
             Properties
           </Link>
+          <Link to="/favourites" className="text-foreground hover:text-primary transition-colors duration-200">
+            Favourites
+          </Link>
           <Link to="/about" className="text-foreground hover:text-primary transition-colors duration-200">
             About
           </Link>
