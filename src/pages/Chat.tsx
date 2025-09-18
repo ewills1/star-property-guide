@@ -22,15 +22,16 @@ interface UserPreferences {
   budget?: number;
   bedrooms?: number;
   location?: string;
+  propertyType?: "rent" | "sale";
 }
 
 const starterQuestions = [
-  "2 bedroom under £1800 in Camden",
-  "Flats in Shoreditch",
-  "3 bedroom under £2500",
-  "1 bedroom near King's Cross",
-  "Family homes in Clapham",
-  "Studio apartments under £1400",
+  "2 bedroom under £1800 to rent in Camden",
+  "Flats to buy in Shoreditch under £500k",
+  "3 bedroom under £2500 to rent",
+  "1 bedroom to buy near King's Cross under £400k",
+  "Family homes to rent in Clapham",
+  "Studio apartments to buy under £350k",
 ];
 
 // Word-to-number mapping for bedroom extraction
@@ -167,24 +168,51 @@ const Chat = () => {
 
   const extractPreferencesFromText = (text: string): Partial<UserPreferences> => {
     const prefs: Partial<UserPreferences> = {};
+    const lowerText = text.toLowerCase();
+
+    // Property type detection
+    const buyKeywords = ["buy", "buying", "purchase", "for sale", "to buy"];
+    const rentKeywords = ["rent", "renting", "rental", "to rent", "for rent", "lease", "letting"];
+    
+    if (buyKeywords.some(keyword => lowerText.includes(keyword))) {
+      prefs.propertyType = "sale";
+    } else if (rentKeywords.some(keyword => lowerText.includes(keyword))) {
+      prefs.propertyType = "rent";
+    }
 
     // Bedrooms
     const bedroomMatch =
       text.match(/(\d+)\s?(?:bed(?:room)?s?)/i) || text.match(/studio/i);
     if (bedroomMatch) {
       prefs.bedrooms = bedroomMatch[0].toLowerCase().includes("studio")
-        ? 0 // you could set studio = 0 or 1 depending on your design
+        ? 1 // Studio = 1 bedroom
         : parseInt(bedroomMatch[1], 10);
     }
 
-    // Budget extraction
-    const budgetRegex =
-      /(?:£\s?(\d+(?:,\d{3})*))|(?:(?:under|below|up to|upto|max(?:imum)?|budget)\s*£?(\d+(?:,\d{3})*))|(\d+(?:,\d{3})*)\s*(?:pcm|p\/m|per month|\/month|monthly|budget)\b/i;
+    // Budget extraction - different patterns for buy vs rent
+    let budgetMatch;
     
-    const budgetMatch = text.match(budgetRegex);
-    if (budgetMatch) {
-      const rawNumber = budgetMatch[1] || budgetMatch[2] || budgetMatch[3];
-      prefs.budget = parseInt(rawNumber.replace(/,/g, ""), 10);
+    if (prefs.propertyType === "sale") {
+      // For buying: look for larger amounts, k notation, or general budget amounts
+      const buyBudgetRegex = /(?:£\s?(\d+(?:,\d{3})*)\s*k)|(?:£\s?(\d+(?:,\d{3})*))|(?:(?:under|below|up to|upto|max(?:imum)?|budget)\s*£?(\d+(?:,\d{3})*)\s*k?)|(\d+(?:,\d{3})*)\s*k\b/i;
+      budgetMatch = text.match(buyBudgetRegex);
+      if (budgetMatch) {
+        const rawNumber = budgetMatch[1] || budgetMatch[2] || budgetMatch[3] || budgetMatch[4];
+        let budget = parseInt(rawNumber.replace(/,/g, ""), 10);
+        // If it ends with 'k' or is less than 10000, assume it's in thousands
+        if (text.toLowerCase().includes('k') || budget < 10000) {
+          budget *= 1000;
+        }
+        prefs.budget = budget;
+      }
+    } else {
+      // For renting: look for monthly amounts
+      const rentBudgetRegex = /(?:£\s?(\d+(?:,\d{3})*))|(?:(?:under|below|up to|upto|max(?:imum)?|budget)\s*£?(\d+(?:,\d{3})*))|(\d+(?:,\d{3})*)\s*(?:pcm|p\/m|per month|\/month|monthly|budget)\b/i;
+      budgetMatch = text.match(rentBudgetRegex);
+      if (budgetMatch) {
+        const rawNumber = budgetMatch[1] || budgetMatch[2] || budgetMatch[3];
+        prefs.budget = parseInt(rawNumber.replace(/,/g, ""), 10);
+      }
     }
 
     // Extract location (from property dataset dynamically)
@@ -203,6 +231,13 @@ const Chat = () => {
 
   const findMatchingProperties = (prefs: UserPreferences) => {
     return mockProperties
+      .filter((property) => {
+        // Filter by property type if specified
+        if (prefs.propertyType && property.type !== prefs.propertyType) {
+          return false;
+        }
+        return true;
+      })
       .map((property) => {
         const propertyPrice = parseInt(
           property.price.replace(/[£,]/g, "").replace("/month", "")
@@ -236,6 +271,7 @@ const Chat = () => {
 
   const getMissingPreferences = (prefs: UserPreferences): string[] => {
     const missing = [];
+    if (!prefs.propertyType) missing.push("whether you want to rent or buy");
     if (!prefs.budget) missing.push("budget");
     if (!prefs.bedrooms) missing.push("number of bedrooms");
     if (!prefs.location) missing.push("preferred location");
@@ -289,24 +325,34 @@ const Chat = () => {
 
         if (missing.length === 0) {
           const matches = findMatchingProperties(updatedPrefs);
+          const budgetText = updatedPrefs.propertyType === "sale" 
+            ? `£${updatedPrefs.budget?.toLocaleString()}` 
+            : `£${updatedPrefs.budget}/month`;
+          const typeText = updatedPrefs.propertyType === "sale" ? "to buy" : "to rent";
+          
           if (matches.length > 0) {
-            botResponse = `Here are the best matches for your preferences (£${updatedPrefs.budget}/month, ${updatedPrefs.bedrooms} bedroom${updatedPrefs.bedrooms !== 1 ? "s" : ""
+            botResponse = `Here are the best matches for your preferences (${budgetText} ${typeText}, ${updatedPrefs.bedrooms} bedroom${updatedPrefs.bedrooms !== 1 ? "s" : ""
               } in ${updatedPrefs.location}):`;
             properties = matches.slice(0, 3);
             messageType = "properties";
           } else {
-            botResponse = `I couldn't find exact matches for (£${updatedPrefs.budget}/month, ${updatedPrefs.bedrooms} bedroom${updatedPrefs.bedrooms !== 1 ? "s" : ""
+            botResponse = `I couldn't find exact matches for (${budgetText} ${typeText}, ${updatedPrefs.bedrooms} bedroom${updatedPrefs.bedrooms !== 1 ? "s" : ""
               } in ${updatedPrefs.location}). Here are some close alternatives:`;
-            properties = findMatchingProperties(updatedPrefs).slice(0, 3);
+            properties = mockProperties.filter(p => p.type === updatedPrefs.propertyType).slice(0, 3);
             messageType = "properties";
           }
-        } else if (missing.length === 3) {
+        } else if (missing.length === 4) {
           botResponse =
-            "I'd be happy to help! Could you tell me your budget, number of bedrooms, and preferred location? I can also provide information about London areas including transport, entertainment, and shopping.";
+            "I'd be happy to help! Could you tell me whether you want to rent or buy, your budget, number of bedrooms, and preferred location? I can also provide information about London areas including transport, entertainment, and shopping.";
         } else {
           const collected: string[] = [];
-          if (updatedPrefs.budget)
-            collected.push(`£${updatedPrefs.budget}/month budget`);
+          if (updatedPrefs.propertyType) collected.push(`looking to ${updatedPrefs.propertyType === "sale" ? "buy" : "rent"}`);
+          if (updatedPrefs.budget) {
+            const budgetText = updatedPrefs.propertyType === "sale" 
+              ? `£${updatedPrefs.budget.toLocaleString()} budget` 
+              : `£${updatedPrefs.budget}/month budget`;
+            collected.push(budgetText);
+          }
           if (updatedPrefs.bedrooms)
             collected.push(
               `${updatedPrefs.bedrooms} bedroom${updatedPrefs.bedrooms !== 1 ? "s" : ""
