@@ -30,6 +30,14 @@ export interface Property {
     email: string;
     photo: string;
   };
+  // Buy-specific fields
+  tenure?: "freehold" | "leasehold";
+  serviceCharge?: string;
+  groundRent?: string;
+  councilTaxBand?: string;
+  epcRating?: string;
+  chainStatus?: "no-chain" | "chain" | "chain-free";
+  stampDuty?: string;
 }
 
 export const mockProperties: Property[] = [
@@ -516,4 +524,299 @@ export const mockProperties: Property[] = [
       photo: "/placeholder.svg"
     }
   },
+  // Buy Properties
+  {
+    id: "16",
+    title: "Modern 2-bed Apartment for Sale",
+    price: "£450,000",
+    location: "Canary Wharf, E14",
+    bedrooms: 2,
+    bathrooms: 2,
+    size: "820 sq ft",
+    type: "sale" as const,
+    available: true,
+    images: ["/placeholder.svg"],
+    description: "Contemporary 2-bedroom apartment in a prestigious development with stunning city views.",
+    features: ["City views", "Concierge", "Balcony", "Modern fixtures"],
+    amenities: {
+      parking: true,
+      wifi: false,
+      kitchen: true,
+      pets: false,
+      furnished: false
+    },
+    council: "Tower Hamlets",
+    transport: "Canary Wharf DLR (3 min walk)",
+    agent: {
+      name: "Jennifer Clarke",
+      company: "Docklands Sales",
+      phone: "020 7890 1234",
+      email: "jennifer@docklandssales.com",
+      photo: "/placeholder.svg"
+    },
+    tenure: "leasehold",
+    serviceCharge: "£2,400/year",
+    groundRent: "£350/year",
+    councilTaxBand: "D",
+    epcRating: "B",
+    chainStatus: "no-chain",
+    stampDuty: "£12,500"
+  },
+  {
+    id: "17",
+    title: "Victorian Terrace House",
+    price: "£650,000",
+    location: "Clapham, SW4",
+    bedrooms: 3,
+    bathrooms: 2,
+    size: "1400 sq ft",
+    type: "sale" as const,
+    available: true,
+    images: ["/placeholder.svg"],
+    description: "Beautiful Victorian terrace house with period features and modern kitchen extension.",
+    features: ["Period features", "Garden", "Extension", "High ceilings"],
+    amenities: {
+      parking: true,
+      wifi: false,
+      kitchen: true,
+      pets: true,
+      furnished: false
+    },
+    council: "Lambeth",
+    transport: "Clapham Common Tube (4 min walk)",
+    agent: {
+      name: "Robert Mills",
+      company: "Heritage Sales",
+      phone: "020 7234 5678",
+      email: "robert@heritagesales.com",
+      photo: "/placeholder.svg"
+    },
+    tenure: "freehold",
+    councilTaxBand: "E",
+    epcRating: "C",
+    chainStatus: "chain-free",
+    stampDuty: "£19,500"
+  },
+  {
+    id: "18",
+    title: "Luxury Penthouse for Sale",
+    price: "£1,200,000",
+    location: "Shoreditch, E1",
+    bedrooms: 3,
+    bathrooms: 3,
+    size: "1600 sq ft",
+    type: "sale" as const,
+    available: true,
+    status: "undergoing-viewings",
+    images: ["/placeholder.svg"],
+    description: "Exceptional penthouse with panoramic London views and premium finishes throughout.",
+    features: ["Panoramic views", "Roof terrace", "Premium finishes", "Concierge"],
+    amenities: {
+      parking: true,
+      wifi: false,
+      kitchen: true,
+      pets: false,
+      furnished: false
+    },
+    council: "Tower Hamlets",
+    transport: "Shoreditch High Street (2 min walk)",
+    agent: {
+      name: "Amanda Foster",
+      company: "Luxury London Sales",
+      phone: "020 7345 6789",
+      email: "amanda@luxurylondonsales.com",
+      photo: "/placeholder.svg"
+    },
+    tenure: "leasehold",
+    serviceCharge: "£4,800/year",
+    groundRent: "£500/year",
+    councilTaxBand: "G",
+    epcRating: "A",
+    chainStatus: "chain",
+    stampDuty: "£54,000"
+  },
+  {
+    id: "19",
+    title: "Family House with Garden",
+    price: "£750,000",
+    location: "Greenwich, SE10",
+    bedrooms: 4,
+    bathrooms: 3,
+    size: "1800 sq ft",
+    type: "sale" as const,
+    available: true,
+    images: ["/placeholder.svg"],
+    description: "Spacious Edwardian family house with large garden and off-street parking.",
+    features: ["Large garden", "Off-street parking", "Period features", "Near schools"],
+    amenities: {
+      parking: true,
+      wifi: false,
+      kitchen: true,
+      pets: true,
+      furnished: false
+    },
+    council: "Greenwich",
+    transport: "Greenwich Station (8 min walk)",
+    agent: {
+      name: "Paul Stevens",
+      company: "Family Home Sales",
+      phone: "020 8123 4567",
+      email: "paul@familyhomesales.com",
+      photo: "/placeholder.svg"
+    },
+    tenure: "freehold",
+    councilTaxBand: "F",
+    epcRating: "D",
+    chainStatus: "no-chain",
+    stampDuty: "£27,500"
+  },
+  {
+    id: "20",
+    title: "Modern Studio for Sale",
+    price: "£320,000",
+    location: "King's Cross, N1",
+    bedrooms: 1,
+    bathrooms: 1,
+    size: "480 sq ft",
+    type: "sale" as const,
+    available: true,
+    images: ["/placeholder.svg"],
+    description: "Contemporary studio apartment perfect for first-time buyers or investors.",
+    features: ["Modern design", "High-speed internet ready", "Concierge", "Investment potential"],
+    amenities: {
+      parking: false,
+      wifi: false,
+      kitchen: true,
+      pets: false,
+      furnished: false
+    },
+    council: "Camden",
+    transport: "King's Cross St. Pancras (5 min walk)",
+    agent: {
+      name: "Lucy Chen",
+      company: "Urban Sales",
+      phone: "020 7456 7890",
+      email: "lucy@urbansales.com",
+      photo: "/placeholder.svg"
+    },
+    tenure: "leasehold",
+    serviceCharge: "£1,800/year",
+    groundRent: "£250/year",
+    councilTaxBand: "C",
+    epcRating: "B",
+    chainStatus: "chain-free",
+    stampDuty: "£6,000"
+  },
+  {
+    id: "21",
+    title: "Riverside Apartment for Sale",
+    price: "£850,000",
+    location: "Battersea, SW11",
+    bedrooms: 2,
+    bathrooms: 2,
+    size: "1050 sq ft",
+    type: "sale" as const,
+    available: false,
+    status: "taken",
+    images: ["/placeholder.svg"],
+    description: "Stunning riverside apartment with Thames views and luxury amenities.",
+    features: ["Thames views", "Balcony", "Concierge", "Gym access"],
+    amenities: {
+      parking: true,
+      wifi: false,
+      kitchen: true,
+      pets: false,
+      furnished: false
+    },
+    council: "Wandsworth",
+    transport: "Battersea Power Station (4 min walk)",
+    agent: {
+      name: "Simon Price",
+      company: "Riverside Properties",
+      phone: "020 7567 8901",
+      email: "simon@riversideproperties.com",
+      photo: "/placeholder.svg"
+    },
+    tenure: "leasehold",
+    serviceCharge: "£3,600/year",
+    groundRent: "£400/year",
+    councilTaxBand: "F",
+    epcRating: "B",
+    chainStatus: "chain",
+    stampDuty: "£32,500"
+  },
+  {
+    id: "22",
+    title: "Chelsea Mansion Flat",
+    price: "£1,450,000",
+    location: "Chelsea, SW3",
+    bedrooms: 3,
+    bathrooms: 2,
+    size: "1200 sq ft",
+    type: "sale" as const,
+    available: true,
+    images: ["/placeholder.svg"],
+    description: "Elegant mansion flat in prime Chelsea location with period features.",
+    features: ["Period features", "High ceilings", "Prime location", "Porter service"],
+    amenities: {
+      parking: false,
+      wifi: false,
+      kitchen: true,
+      pets: true,
+      furnished: false
+    },
+    council: "Kensington and Chelsea",
+    transport: "Sloane Square Tube (6 min walk)",
+    agent: {
+      name: "Caroline Webb",
+      company: "Prime Chelsea Sales",
+      phone: "020 7678 9012",
+      email: "caroline@primechelsea.com",
+      photo: "/placeholder.svg"
+    },
+    tenure: "leasehold",
+    serviceCharge: "£5,200/year",
+    groundRent: "£600/year",
+    councilTaxBand: "H",
+    epcRating: "E",
+    chainStatus: "no-chain",
+    stampDuty: "£72,500"
+  },
+  {
+    id: "23",
+    title: "Converted Warehouse Loft",
+    price: "£580,000",
+    location: "Hackney, E8",
+    bedrooms: 2,
+    bathrooms: 2,
+    size: "1100 sq ft",
+    type: "sale" as const,
+    available: true,
+    images: ["/placeholder.svg"],
+    description: "Unique converted warehouse loft with industrial features and modern amenities.",
+    features: ["Industrial features", "High ceilings", "Exposed brick", "Modern amenities"],
+    amenities: {
+      parking: false,
+      wifi: false,
+      kitchen: true,
+      pets: true,
+      furnished: false
+    },
+    council: "Hackney",
+    transport: "London Fields (7 min walk)",
+    agent: {
+      name: "Alex Thompson",
+      company: "Industrial Sales",
+      phone: "020 7789 0123",
+      email: "alex@industrialsales.com",
+      photo: "/placeholder.svg"
+    },
+    tenure: "leasehold",
+    serviceCharge: "£2,200/year",
+    groundRent: "£300/year",
+    councilTaxBand: "E",
+    epcRating: "C",
+    chainStatus: "chain-free",
+    stampDuty: "£19,000"
+  }
 ];

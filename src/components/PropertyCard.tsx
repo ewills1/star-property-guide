@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, Bed, Bath, Square, MapPin, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 interface PropertyCardProps {
   id?: string;
@@ -11,7 +12,7 @@ interface PropertyCardProps {
   bedrooms: number;
   bathrooms: number;
   size: string;
-  type: "rent" | "buy";
+  type: "rent" | "sale";
   available: boolean;
   status?: "available" | "undergoing-viewings" | "taken";
   image?: string;
