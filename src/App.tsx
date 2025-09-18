@@ -7,6 +7,7 @@ import Homepage from "./pages/Homepage";
 import Chat from "./pages/Chat";
 import PropertyDetails from "./pages/PropertyDetails";
 import NotFound from "./pages/NotFound";
+import Properties from "./pages/Properties";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<Homepage />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/property/:id" element={<PropertyDetails />} />
+          <Route path="/properties" element={<Properties />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
