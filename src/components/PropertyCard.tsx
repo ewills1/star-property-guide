@@ -44,21 +44,6 @@ const PropertyCard = ({
       } cursor-pointer`}
       onClick={handleClick}
     >
-      {status === "undergoing-viewings" && (
-        <div className="absolute top-3 right-3 z-10">
-          <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
-            Undergoing Viewings
-          </Badge>
-        </div>
-      )}
-      {status === "taken" && (
-        <div className="absolute top-3 right-3 z-10">
-          <Badge variant="secondary" className="bg-unavailable text-unavailable-foreground">
-            <Check className="h-3 w-3 mr-1" />
-            Taken
-          </Badge>
-        </div>
-      )}
       
       {image && (
         <div className="h-48 bg-muted overflow-hidden">
@@ -77,6 +62,22 @@ const PropertyCard = ({
           </Badge>
           <span className="text-xl font-bold text-primary">{price}</span>
         </div>
+        
+        {status === "undergoing-viewings" && (
+          <div className="mb-2">
+            <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
+              Undergoing Viewings
+            </Badge>
+          </div>
+        )}
+        {status === "taken" && (
+          <div className="mb-2">
+            <Badge variant="secondary" className="bg-unavailable text-unavailable-foreground">
+              <Check className="h-3 w-3 mr-1" />
+              Taken
+            </Badge>
+          </div>
+        )}
         
         <h3 className="font-semibold text-foreground mb-1">{title}</h3>
         

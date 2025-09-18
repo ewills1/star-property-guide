@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -66,6 +67,14 @@ const mockPropertiesDetailed = getPropertyDetails();
 const PropertyDetails = () => {
   const { id } = useParams();
   const property = mockPropertiesDetailed[id as keyof typeof mockPropertiesDetailed];
+  const viewingBookingRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToViewingBooking = () => {
+    viewingBookingRef.current?.scrollIntoView({ 
+      behavior: "smooth", 
+      block: "start" 
+    });
+  };
 
   if (!property) {
     return (
@@ -206,12 +215,12 @@ const PropertyDetails = () => {
 
                 <div className="flex gap-3">
                   {property.available && property.status !== "undergoing-viewings" && (
-                    <Button className="flex-1">
+                    <Button className="flex-1" onClick={scrollToViewingBooking}>
                       Arrange Viewing
                     </Button>
                   )}
                   {property.status === "undergoing-viewings" && (
-                    <Button className="flex-1" variant="outline">
+                    <Button className="flex-1" variant="outline" onClick={scrollToViewingBooking}>
                       Join Viewing Queue
                     </Button>
                   )}
@@ -319,10 +328,12 @@ const PropertyDetails = () => {
 
             {/* Viewing Booking */}
             {(property.available || property.status === "undergoing-viewings") && (
-              <ViewingBooking 
-                propertyId={property.id}
-                propertyTitle={property.title}
-              />
+              <div ref={viewingBookingRef}>
+                <ViewingBooking 
+                  propertyId={property.id}
+                  propertyTitle={property.title}
+                />
+              </div>
             )}
           </div>
         </div>
