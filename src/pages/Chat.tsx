@@ -230,12 +230,20 @@ const Chat = () => {
   const extractPreferencesFromText = (text: string): Partial<UserPreferences> => {
     const prefs: Partial<UserPreferences> = {};
 
-    // Extract budget
-    // Budget extraction — only match numbers that look like money:
-    // - "£3000"
-    // - "under 3000", "up to 2,500", "max 2500"
-    // - "2500 pcm", "2500 per month", "2500 monthly", "2500 budget"
-    const budgetRegex = /(?:£\s?(\d+(?:,\d{3})*))|(?:(?:under|below|up to|upto|max(?:imum)?|budget)\s*£?(\d+(?:,\d{3})*))|(\d+(?:,\d{3})*)\s*(?:pcm|p\/m|per month|\/month|monthly|budget)\b/i;
+
+    // Bedrooms
+    const bedroomMatch =
+      text.match(/(\d+)\s?(?:bed(?:room)?s?)/i) || text.match(/studio/i);
+    if (bedroomMatch) {
+      prefs.bedrooms = bedroomMatch[0].toLowerCase().includes("studio")
+        ? 0 // you could set studio = 0 or 1 depending on your design
+        : parseInt(bedroomMatch[1], 10);
+    }
+
+        // Budget extraction
+    const budgetRegex =
+      /(?:£\s?(\d+(?:,\d{3})*))|(?:(?:under|below|up to|upto|max(?:imum)?|budget)\s*£?(\d+(?:,\d{3})*))|(\d+(?:,\d{3})*)\s*(?:pcm|p\/m|per month|\/month|monthly|budget)\b/i;
+    
     const budgetMatch = text.match(budgetRegex);
     if (budgetMatch) {
       const rawNumber = budgetMatch[1] || budgetMatch[2] || budgetMatch[3];
@@ -243,19 +251,6 @@ const Chat = () => {
     }
 
 
-
-    // Extract bedrooms (digit or word form)
-    const bedroomMatch = text.match(/(\d+)\s?bed(?:room)?s?/i);
-    if (bedroomMatch) {
-      prefs.bedrooms = parseInt(bedroomMatch[1]);
-    } else {
-      const wordMatch = text.match(
-        /(one|two|three|four|five)\s?bed(?:room)?s?/i
-      );
-      if (wordMatch) {
-        prefs.bedrooms = numberWords[wordMatch[1].toLowerCase()];
-      }
-    }
 
     // Extract location (from property dataset dynamically)
     const locations = [
