@@ -2,132 +2,42 @@ import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, Car, Wifi, Utensils, Check, X, Phone, Mail, User } from "lucide-react";
+import { ArrowLeft, MapPin, Bed, Bath, Square, Check, X, Phone, Mail } from "lucide-react";
+import { mockProperties } from "@/data/mockProperties"; // import your earlier mock properties array
 
-// Extended mock property data with full details
-const mockPropertiesDetailed = {
-  "1": {
-    id: "1",
-    title: "Modern 2-bed Flat",
-    price: "£1,400/month",
-    location: "Canary Wharf, E14",
-    bedrooms: 2,
-    bathrooms: 1,
-    size: "850 sq ft",
-    type: "rent" as const,
-    available: true,
-    images: [
-      "/placeholder.svg",
-      "/placeholder.svg", 
-      "/placeholder.svg"
-    ],
-    description: "A stunning modern 2-bedroom apartment in the heart of Canary Wharf. Features floor-to-ceiling windows with spectacular city views, contemporary kitchen with integrated appliances, and access to building amenities including gym and concierge.",
-    features: [
-      "Floor-to-ceiling windows",
-      "City skyline views",
-      "Modern kitchen with appliances",
-      "Building gym & concierge",
-      "24/7 security",
-      "Balcony",
-      "Underground parking available"
-    ],
-    amenities: {
-      parking: true,
-      wifi: true,
-      kitchen: true,
-      pets: false,
-      furnished: true
-    },
-    availableFrom: "Immediately",
-    deposit: "£2,800",
-    council: "Tower Hamlets",
-    transport: "Canary Wharf DLR & Underground (2 min walk)",
-    agent: {
-      name: "Sarah Johnson",
-      company: "Prime London Properties",
-      phone: "020 7123 4567",
-      email: "sarah.j@primelondon.co.uk",
-      photo: "/placeholder.svg"
-    }
-  },
-  "2": {
-    id: "2", 
-    title: "Victorian House",
-    price: "£1,650/month",
-    location: "Clapham, SW4",
-    bedrooms: 3,
-    bathrooms: 2,
-    size: "1200 sq ft",
-    type: "rent" as const,
-    available: false,
-    images: ["/placeholder.svg", "/placeholder.svg"],
-    description: "Beautiful Victorian house conversion with period features and modern amenities. Located on a quiet residential street just minutes from Clapham Common and excellent transport links.",
-    features: [
-      "Period features",
-      "High ceilings", 
-      "Garden access",
-      "Modern bathroom",
-      "Original wood floors",
-      "Separate dining room"
-    ],
-    amenities: {
-      parking: false,
-      wifi: true,
-      kitchen: true,
-      pets: true,
-      furnished: false
-    },
-    availableFrom: "Not available",
-    deposit: "£3,300",
-    council: "Lambeth",
-    transport: "Clapham Common Underground (5 min walk)",
-    agent: {
-      name: "Michael Chen",
-      company: "South London Estates",
-      phone: "020 7234 5678",
-      email: "m.chen@southlondon.co.uk",
-      photo: "/placeholder.svg"
-    }
-  },
-  "3": {
-    id: "3",
-    title: "Studio Apartment", 
-    price: "£1,200/month",
-    location: "King's Cross, N1",
-    bedrooms: 1,
-    bathrooms: 1,
-    size: "450 sq ft",
-    type: "rent" as const,
-    available: true,
-    images: ["/placeholder.svg"],
-    description: "Stylish studio apartment in a converted warehouse building. Open plan living with high ceilings and large windows. Perfect for young professionals.",
-    features: [
-      "Open plan design",
-      "High ceilings",
-      "Large windows",
-      "Modern bathroom",
-      "Built-in storage"
-    ],
-    amenities: {
-      parking: false,
-      wifi: true,
-      kitchen: true,
-      pets: false,
-      furnished: true
-    },
-    availableFrom: "1st Feb 2024",
-    deposit: "£2,400",
-    council: "Camden",
-    transport: "King's Cross St Pancras (3 min walk)",
-    agent: {
-      name: "Emma Thompson",
-      company: "Central London Lettings",
-      phone: "020 7345 6789",
-      email: "emma@centrallondon.co.uk",
-      photo: "/placeholder.svg"
-    }
-  }
+// Create a detailed map from the array
+const getPropertyDetails = () => {
+  const map: Record<string, any> = {};
+  mockProperties.forEach((p) => {
+    map[p.id] = {
+      ...p,
+      images: p.images || ["/placeholder.svg"],
+      description: p.description || `Beautiful ${p.bedrooms}-bed property in ${p.location}.`,
+      features: p.features || ["Spacious", "Great location"],
+      amenities: p.amenities || {
+        parking: false,
+        wifi: true,
+        kitchen: true,
+        pets: false,
+        furnished: false
+      },
+      availableFrom: p.availableFrom || "Immediately",
+      deposit: p.deposit || "N/A",
+      council: p.council || "N/A",
+      transport: p.transport || "N/A",
+      agent: p.agent || {
+        name: "Agent Name",
+        company: "Agency",
+        phone: "020 0000 0000",
+        email: "agent@example.com",
+        photo: "/placeholder.svg"
+      }
+    };
+  });
+  return map;
 };
+
+const mockPropertiesDetailed = getPropertyDetails();
 
 const PropertyDetails = () => {
   const { id } = useParams();
@@ -151,7 +61,6 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      {/* Header */}
       <header className="bg-card border-b border-border shadow-soft">
         <div className="container mx-auto px-4 py-4">
           <Link to="/chat" className="inline-flex items-center text-primary hover:text-primary-hover transition-colors">
@@ -163,7 +72,6 @@ const PropertyDetails = () => {
 
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Image Gallery */}
             <Card>
@@ -242,7 +150,6 @@ const PropertyDetails = () => {
                 </div>
 
                 <div className="text-3xl font-bold text-primary mb-4">{property.price}</div>
-                
                 <h1 className="text-xl font-semibold text-foreground mb-2">{property.title}</h1>
                 
                 <div className="flex items-center text-muted-foreground mb-6">
@@ -357,51 +264,17 @@ const PropertyDetails = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-center">
-                    {property.amenities.parking ? 
-                      <Check className="h-4 w-4 text-success mr-2" /> : 
-                      <X className="h-4 w-4 text-muted-foreground mr-2" />
-                    }
-                    <span className={property.amenities.parking ? "text-foreground" : "text-muted-foreground"}>
-                      Parking
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    {property.amenities.wifi ? 
-                      <Check className="h-4 w-4 text-success mr-2" /> : 
-                      <X className="h-4 w-4 text-muted-foreground mr-2" />
-                    }
-                    <span className={property.amenities.wifi ? "text-foreground" : "text-muted-foreground"}>
-                      WiFi
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    {property.amenities.kitchen ? 
-                      <Check className="h-4 w-4 text-success mr-2" /> : 
-                      <X className="h-4 w-4 text-muted-foreground mr-2" />
-                    }
-                    <span className={property.amenities.kitchen ? "text-foreground" : "text-muted-foreground"}>
-                      Kitchen
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    {property.amenities.pets ? 
-                      <Check className="h-4 w-4 text-success mr-2" /> : 
-                      <X className="h-4 w-4 text-muted-foreground mr-2" />
-                    }
-                    <span className={property.amenities.pets ? "text-foreground" : "text-muted-foreground"}>
-                      Pets allowed
-                    </span>
-                  </div>
-                  <div className="flex items-center col-span-2">
-                    {property.amenities.furnished ? 
-                      <Check className="h-4 w-4 text-success mr-2" /> : 
-                      <X className="h-4 w-4 text-muted-foreground mr-2" />
-                    }
-                    <span className={property.amenities.furnished ? "text-foreground" : "text-muted-foreground"}>
-                      Furnished
-                    </span>
-                  </div>
+                  {Object.entries(property.amenities).map(([key, available]) => (
+                    <div key={key} className="flex items-center">
+                      {available ? 
+                        <Check className="h-4 w-4 text-success mr-2" /> : 
+                        <X className="h-4 w-4 text-muted-foreground mr-2" 
+                      />}
+                      <span className={available ? "text-foreground" : "text-muted-foreground"}>
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
