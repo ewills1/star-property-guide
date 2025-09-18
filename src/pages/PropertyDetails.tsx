@@ -205,7 +205,7 @@ const PropertyDetails = () => {
                 </div>
 
                 <div className="flex gap-3">
-                  {property.available && (
+                  {property.available && property.status !== "undergoing-viewings" && (
                     <Button className="flex-1">
                       Arrange Viewing
                     </Button>
