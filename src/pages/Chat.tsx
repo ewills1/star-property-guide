@@ -43,22 +43,73 @@ const numberWords: Record<string, number> = {
 };
 
 const Chat = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: crypto.randomUUID(),
-      type: "text",
-      text: "Hello! I'm here to help you find the perfect property in London. To get started, I'll need to know your budget, number of bedrooms, and preferred location. I can also provide information about London areas including transport, entertainment, and shopping. What are you looking for?",
-      sender: "bot",
-      timestamp: new Date(),
-    },
-  ]);
+  // Load saved state from localStorage or use default
+  const loadSavedState = () => {
+    try {
+      const savedMessages = localStorage.getItem('chat-messages');
+      const savedPreferences = localStorage.getItem('chat-preferences');
+      
+      return {
+        messages: savedMessages 
+          ? JSON.parse(savedMessages).map((msg: any) => ({
+              ...msg,
+              timestamp: new Date(msg.timestamp)
+            }))
+          : [
+              {
+                id: crypto.randomUUID(),
+                type: "text",
+                text: "Hello! I'm here to help you find the perfect property in London. To get started, I'll need to know your budget, number of bedrooms, and preferred location. I can also provide information about London areas including transport, entertainment, and shopping. What are you looking for?",
+                sender: "bot",
+                timestamp: new Date(),
+              },
+            ],
+        preferences: savedPreferences ? JSON.parse(savedPreferences) : {}
+      };
+    } catch (error) {
+      console.error('Error loading saved chat state:', error);
+      return {
+        messages: [
+          {
+            id: crypto.randomUUID(),
+            type: "text",
+            text: "Hello! I'm here to help you find the perfect property in London. To get started, I'll need to know your budget, number of bedrooms, and preferred location. I can also provide information about London areas including transport, entertainment, and shopping. What are you looking for?",
+            sender: "bot",
+            timestamp: new Date(),
+          },
+        ],
+        preferences: {}
+      };
+    }
+  };
+
+  const savedState = loadSavedState();
+  const [messages, setMessages] = useState<ChatMessage[]>(savedState.messages);
   const [inputText, setInputText] = useState("");
-  const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>(savedState.preferences);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const botTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleStarterClick = (question: string) => {
     handleSendMessage(question);
+  };
+
+  // Clear chat function
+  const clearChat = () => {
+    const initialMessages = [
+      {
+        id: crypto.randomUUID(),
+        type: "text" as const,
+        text: "Hello! I'm here to help you find the perfect property in London. To get started, I'll need to know your budget, number of bedrooms, and preferred location. I can also provide information about London areas including transport, entertainment, and shopping. What are you looking for?",
+        sender: "bot" as const,
+        timestamp: new Date(),
+      },
+    ];
+    
+    setMessages(initialMessages);
+    setUserPreferences({});
+    localStorage.removeItem('chat-messages');
+    localStorage.removeItem('chat-preferences');
   };
 
   // Detect if user is asking about location information
@@ -287,6 +338,24 @@ const Chat = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('chat-messages', JSON.stringify(messages));
+    } catch (error) {
+      console.error('Error saving messages to localStorage:', error);
+    }
+  }, [messages]);
+
+  // Save user preferences to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('chat-preferences', JSON.stringify(userPreferences));
+    } catch (error) {
+      console.error('Error saving preferences to localStorage:', error);
+    }
+  }, [userPreferences]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
