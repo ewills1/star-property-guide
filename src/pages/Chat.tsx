@@ -174,10 +174,20 @@ const Chat = () => {
     const buyKeywords = ["buy", "buying", "purchase", "for sale", "to buy"];
     const rentKeywords = ["rent", "renting", "rental", "to rent", "for rent", "lease", "letting"];
     
+    let newPropertyType: "rent" | "sale" | undefined = undefined;
+    
     if (buyKeywords.some(keyword => lowerText.includes(keyword))) {
-      prefs.propertyType = "sale";
+      newPropertyType = "sale";
     } else if (rentKeywords.some(keyword => lowerText.includes(keyword))) {
-      prefs.propertyType = "rent";
+      newPropertyType = "rent";
+    }
+    
+    // If property type is changing, reset budget since buy/rent have different budget scales
+    if (newPropertyType && newPropertyType !== userPreferences.propertyType) {
+      prefs.propertyType = newPropertyType;
+      prefs.budget = undefined; // Reset budget when switching property type
+    } else if (newPropertyType) {
+      prefs.propertyType = newPropertyType;
     }
 
     // Bedrooms
@@ -191,8 +201,9 @@ const Chat = () => {
 
     // Budget extraction - different patterns for buy vs rent
     let budgetMatch;
+    const currentPropertyType = prefs.propertyType || userPreferences.propertyType;
     
-    if (prefs.propertyType === "sale") {
+    if (currentPropertyType === "sale") {
       // For buying: look for larger amounts, k notation, or general budget amounts
       const buyBudgetRegex = /(?:£\s?(\d+(?:,\d{3})*)\s*k)|(?:£\s?(\d+(?:,\d{3})*))|(?:(?:under|below|up to|upto|max(?:imum)?|budget)\s*£?(\d+(?:,\d{3})*)\s*k?)|(\d+(?:,\d{3})*)\s*k\b/i;
       budgetMatch = text.match(buyBudgetRegex);
@@ -205,7 +216,7 @@ const Chat = () => {
         }
         prefs.budget = budget;
       }
-    } else {
+    } else if (currentPropertyType === "rent") {
       // For renting: look for monthly amounts
       const rentBudgetRegex = /(?:£\s?(\d+(?:,\d{3})*))|(?:(?:under|below|up to|upto|max(?:imum)?|budget)\s*£?(\d+(?:,\d{3})*))|(\d+(?:,\d{3})*)\s*(?:pcm|p\/m|per month|\/month|monthly|budget)\b/i;
       budgetMatch = text.match(rentBudgetRegex);
@@ -298,6 +309,14 @@ const Chat = () => {
     if (!isLocationQuery(messageText)) {
       const newPrefs = extractPreferencesFromText(messageText);
       updatedPrefs = { ...userPreferences, ...newPrefs };
+      
+      // Handle budget reset notification when property type changes
+      const isPropertyTypeChange = newPrefs.propertyType && newPrefs.propertyType !== userPreferences.propertyType;
+      if (isPropertyTypeChange && newPrefs.budget === undefined && userPreferences.budget) {
+        // Clear the previous budget since we're switching property types
+        updatedPrefs.budget = undefined;
+      }
+      
       setUserPreferences(updatedPrefs);
     }
 
@@ -346,6 +365,10 @@ const Chat = () => {
             "I'd be happy to help! Could you tell me whether you want to rent or buy, your budget, number of bedrooms, and preferred location? I can also provide information about London areas including transport, entertainment, and shopping.";
         } else {
           const collected: string[] = [];
+          const isPropertyTypeChange = userPreferences.propertyType && 
+            extractPreferencesFromText(messageText).propertyType && 
+            extractPreferencesFromText(messageText).propertyType !== userPreferences.propertyType;
+            
           if (updatedPrefs.propertyType) collected.push(`looking to ${updatedPrefs.propertyType === "sale" ? "buy" : "rent"}`);
           if (updatedPrefs.budget) {
             const budgetText = updatedPrefs.propertyType === "sale" 
@@ -360,9 +383,20 @@ const Chat = () => {
             );
           if (updatedPrefs.location) collected.push(`${updatedPrefs.location}`);
 
-          botResponse = `Got it! I have your ${collected.join(
-            " and "
-          )}. Could you also tell me your ${missing.join(" and ")}?`;
+          let baseResponse = "";
+          if (isPropertyTypeChange && userPreferences.budget && !updatedPrefs.budget) {
+            const newType = updatedPrefs.propertyType === "sale" ? "buying" : "renting";
+            const budgetType = updatedPrefs.propertyType === "sale" ? "total budget" : "monthly budget";
+            baseResponse = `I see you've switched to ${newType}! I've reset your budget since ${newType} uses a different budget scale. `;
+          }
+
+          if (collected.length > 0) {
+            botResponse = `${baseResponse}Got it! I have your ${collected.join(
+              " and "
+            )}. Could you also tell me your ${missing.join(" and ")}?`;
+          } else {
+            botResponse = `${baseResponse}Could you tell me your ${missing.join(" and ")}?`;
+          }
         }
       }
 
