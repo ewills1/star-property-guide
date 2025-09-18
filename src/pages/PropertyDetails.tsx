@@ -3,11 +3,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Bed, Bath, Square, Check, X, Phone, Mail } from "lucide-react";
-import { mockProperties } from "@/data/mockProperties"; // import your earlier mock properties array
+import { mockProperties, Property } from "@/data/mockProperties";
 
 // Create a detailed map from the array
 const getPropertyDetails = () => {
-  const map: Record<string, any> = {};
+  const map: Record<string, Property & {
+    images: string[];
+    description: string;
+    features: string[];
+    amenities: {
+      parking: boolean;
+      wifi: boolean;
+      kitchen: boolean;
+      pets: boolean;
+      furnished: boolean;
+    };
+    availableFrom: string;
+    deposit: string;
+    council: string;
+    transport: string;
+    agent: {
+      name: string;
+      company: string;
+      phone: string;
+      email: string;
+      photo: string;
+    };
+  }> = {};
+  
   mockProperties.forEach((p) => {
     map[p.id] = {
       ...p,
@@ -268,8 +291,8 @@ const PropertyDetails = () => {
                     <div key={key} className="flex items-center">
                       {available ? 
                         <Check className="h-4 w-4 text-success mr-2" /> : 
-                        <X className="h-4 w-4 text-muted-foreground mr-2" 
-                      />}
+                        <X className="h-4 w-4 text-muted-foreground mr-2" />
+                      }
                       <span className={available ? "text-foreground" : "text-muted-foreground"}>
                         {key.charAt(0).toUpperCase() + key.slice(1)}
                       </span>
