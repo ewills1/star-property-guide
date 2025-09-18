@@ -231,10 +231,11 @@ const Chat = () => {
     const prefs: Partial<UserPreferences> = {};
 
     // Extract budget
-    const budgetMatch = text.match(/£(\d{1,3}(?:,\d{3})*|\d+)/);
+    const budgetMatch = text.match(/£?(\d+(?:,\d{3})*)/);
     if (budgetMatch) {
-      prefs.budget = parseInt(budgetMatch[1].replace(/,/g, ""));
+      prefs.budget = parseInt(budgetMatch[1].replace(/,/g, ""), 10);
     }
+
 
     // Extract bedrooms (digit or word form)
     const bedroomMatch = text.match(/(\d+)\s?bed(?:room)?s?/i);
