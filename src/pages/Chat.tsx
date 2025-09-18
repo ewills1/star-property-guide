@@ -22,10 +22,10 @@ interface UserPreferences {
 }
 
 const starterQuestions = [
-  "2-bed under £1800 in Camden",
+  "2 bedroom under £1800 in Camden",
   "Flats in Shoreditch",
-  "3-bed under £2500",
-  "1-bed near King's Cross",
+  "3 bedroom under £2500",
+  "1 bedroom near King's Cross",
   "Family homes in Clapham",
   "Studio apartments under £1400",
 ];
