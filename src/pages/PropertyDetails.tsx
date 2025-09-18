@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, Car, Wifi, Utensils, Check, X } from "lucide-react";
+import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, Car, Wifi, Utensils, Check, X, Phone, Mail, User } from "lucide-react";
 
 // Extended mock property data with full details
 const mockPropertiesDetailed = {
@@ -41,7 +41,14 @@ const mockPropertiesDetailed = {
     availableFrom: "Immediately",
     deposit: "£2,800",
     council: "Tower Hamlets",
-    transport: "Canary Wharf DLR & Underground (2 min walk)"
+    transport: "Canary Wharf DLR & Underground (2 min walk)",
+    agent: {
+      name: "Sarah Johnson",
+      company: "Prime London Properties",
+      phone: "020 7123 4567",
+      email: "sarah.j@primelondon.co.uk",
+      photo: "/placeholder.svg"
+    }
   },
   "2": {
     id: "2", 
@@ -73,7 +80,14 @@ const mockPropertiesDetailed = {
     availableFrom: "Not available",
     deposit: "£3,300",
     council: "Lambeth",
-    transport: "Clapham Common Underground (5 min walk)"
+    transport: "Clapham Common Underground (5 min walk)",
+    agent: {
+      name: "Michael Chen",
+      company: "South London Estates",
+      phone: "020 7234 5678",
+      email: "m.chen@southlondon.co.uk",
+      photo: "/placeholder.svg"
+    }
   },
   "3": {
     id: "3",
@@ -104,7 +118,14 @@ const mockPropertiesDetailed = {
     availableFrom: "1st Feb 2024",
     deposit: "£2,400",
     council: "Camden",
-    transport: "King's Cross St Pancras (3 min walk)"
+    transport: "King's Cross St Pancras (3 min walk)",
+    agent: {
+      name: "Emma Thompson",
+      company: "Central London Lettings",
+      phone: "020 7345 6789",
+      email: "emma@centrallondon.co.uk",
+      photo: "/placeholder.svg"
+    }
   }
 };
 
@@ -247,12 +268,22 @@ const PropertyDetails = () => {
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full" 
-                  disabled={!property.available}
-                >
-                  {property.available ? "Enquire Now" : "Not Available"}
-                </Button>
+                <div className="flex gap-3">
+                  <Button 
+                    className="flex-1" 
+                    disabled={!property.available}
+                  >
+                    {property.available ? "Arrange Viewing" : "Not Available"}
+                  </Button>
+                  {property.available && (
+                    <Button variant="outline" className="flex-1" asChild>
+                      <a href={`tel:${property.agent.phone}`}>
+                        <Phone className="h-4 w-4 mr-2" />
+                        Call Now
+                      </a>
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -277,6 +308,44 @@ const PropertyDetails = () => {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Transport:</span>
                   <span className="font-medium text-sm">{property.transport}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Agent Contact */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Estate Agent</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-muted overflow-hidden flex-shrink-0">
+                    <img 
+                      src={property.agent.photo} 
+                      alt={property.agent.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <div className="font-medium text-foreground">{property.agent.name}</div>
+                    <div className="text-sm text-muted-foreground">{property.agent.company}</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <Button variant="outline" className="w-full justify-start" asChild>
+                    <a href={`tel:${property.agent.phone}`}>
+                      <Phone className="h-4 w-4 mr-2" />
+                      {property.agent.phone}
+                    </a>
+                  </Button>
+                  
+                  <Button variant="outline" className="w-full justify-start" asChild>
+                    <a href={`mailto:${property.agent.email}?subject=Viewing Request - ${property.title}&body=Hi ${property.agent.name},%0D%0A%0D%0AI would like to arrange a viewing for the property: ${property.title} at ${property.location}.%0D%0A%0D%0APlease let me know your availability.%0D%0A%0D%0AThank you.`}>
+                      <Mail className="h-4 w-4 mr-2" />
+                      Send Email
+                    </a>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
